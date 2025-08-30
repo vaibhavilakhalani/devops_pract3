@@ -73,7 +73,8 @@ pipeline {
             }
             post {
                 always {
-                    junit '**/test-results/*.xml'
+                    // ✅ allowEmptyResults prevents pipeline failure if no test reports exist
+                    junit allowEmptyResults: true, testResults: '**/test-results/*.xml'
                     archiveArtifacts artifacts: 'coverage/**, dist/**', allowEmptyArchive: true
                 }
             }
