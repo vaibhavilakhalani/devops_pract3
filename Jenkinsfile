@@ -15,6 +15,18 @@ pipeline {
             }
         }
 
+        stage('Debug Workspace') {
+            steps {
+                script {
+                    if (isUnix()) {
+                        sh 'ls -la'
+                    } else {
+                        bat 'dir'
+                    }
+                }
+            }
+        }
+
         stage('Install') {
             steps {
                 script {
