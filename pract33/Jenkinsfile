@@ -29,11 +29,13 @@ pipeline {
 
         stage('Install') {
             steps {
-                script {
-                    if (isUnix()) {
-                        sh 'npm install'
-                    } else {
-                        bat 'npm install'
+                dir('pract33') {  // <-- Change to your project folder
+                    script {
+                        if (isUnix()) {
+                            sh 'npm install'
+                        } else {
+                            bat 'npm install'
+                        }
                     }
                 }
             }
@@ -41,11 +43,13 @@ pipeline {
 
         stage('Build') {
             steps {
-                script {
-                    if (isUnix()) {
-                        sh 'npm run build || echo "No build script, continuing..."'
-                    } else {
-                        bat 'npm run build || echo "No build script, continuing..."'
+                dir('pract33') {
+                    script {
+                        if (isUnix()) {
+                            sh 'npm run build || echo "No build script, continuing..."'
+                        } else {
+                            bat 'npm run build || echo "No build script, continuing..."'
+                        }
                     }
                 }
             }
@@ -53,18 +57,18 @@ pipeline {
 
         stage('Test') {
             steps {
-                script {
-                    if (isUnix()) {
-                        // Allow pipeline to continue even if tests fail (remove "|| true" to fail on tests)
-                        sh 'npm test || true'
-                    } else {
-                        bat 'npm test || echo "Tests returned non-zero"'
+                dir('pract33') {
+                    script {
+                        if (isUnix()) {
+                            sh 'npm test || true'
+                        } else {
+                            bat 'npm test || echo "Tests returned non-zero"'
+                        }
                     }
                 }
             }
             post {
                 always {
-                    // Collect test results if available
                     junit '**/test-results/*.xml'
                     archiveArtifacts artifacts: 'coverage/**, dist/**', allowEmptyArchive: true
                 }
@@ -73,21 +77,23 @@ pipeline {
 
         stage('Deploy (Simulated)') {
             steps {
-                script {
-                    if (isUnix()) {
-                        sh '''
-                            echo "Deploying application (simulated)..."
-                            mkdir -p deploy_output
-                            echo "Deployed at $(date)" > deploy_output/deploy-info.txt
-                            ls -la
-                        '''
-                    } else {
-                        bat '''
-                            echo Deploying application (simulated)...
-                            if not exist deploy_output mkdir deploy_output
-                            echo Deployed at %DATE% %TIME% > deploy_output\\deploy-info.txt
-                            dir
-                        '''
+                dir('pract33') {
+                    script {
+                        if (isUnix()) {
+                            sh '''
+                                echo "Deploying application (simulated)..."
+                                mkdir -p deploy_output
+                                echo "Deployed at $(date)" > deploy_output/deploy-info.txt
+                                ls -la
+                            '''
+                        } else {
+                            bat '''
+                                echo Deploying application (simulated)...
+                                if not exist deploy_output mkdir deploy_output
+                                echo Deployed at %DATE% %TIME% > deploy_output\\deploy-info.txt
+                                dir
+                            '''
+                        }
                     }
                 }
             }
